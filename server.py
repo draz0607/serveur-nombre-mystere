@@ -1,20 +1,24 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import random
+import os
 
 app = Flask(__name__)
 CORS(app)
 
-# Valeur du nombre mystère (à chaque redémarrage du serveur, il est réinitialisé)
+# Le nombre mystère est tiré au sort à chaque redémarrage du serveur
 nombre_mystere = random.randint(1, 100)
 
-@app.route("/")
+@app.route("/", methods=["GET"])
 def index():
     return "Bienvenue sur le serveur du jeu du nombre mystère !"
 
 @app.route("/deviner", methods=["POST"])
 def deviner():
     data = request.get_json()
+    if not data or "nombre" not in data:
+        return jsonify({"message": "Donnée manquante."}), 400
+
     try:
         tentative = int(data.get("nombre"))
     except (ValueError, TypeError):
@@ -28,9 +32,5 @@ def deviner():
         return jsonify({"resultat": "bravo"})
 
 if __name__ == "__main__":
-    import os
-    port = int(os.environ.get("PORT", 10000))  # 10000 est une valeur par défaut facultative
+    port = int(os.environ.get("PORT", 5000))  # Render fournit PORT dans les variables d'env
     app.run(host="0.0.0.0", port=port)
-# Déploiement Render - test commit
-# Forcer un nouveau commit pour Render
-# tetetetetett
